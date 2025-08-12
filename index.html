@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oedle - Arkadaş Tahmin Oyunu</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #4f46e5, #9333ea, #1e40af);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        }
+
+        h1 {
+            text-align: center;
+            font-weight: bold;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .mode-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 8px 16px;
+            border-radius: 10px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .daily-btn {
+            background-color: #22c55e;
+            color: white;
+        }
+
+        .infinite-btn {
+            background-color: #6b7280;
+            color: white;
+        }
+
+        .infinite-btn.active {
+            background-color: #22c55e;
+        }
+
+        .description {
+            text-align: center;
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+
+        .guess-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .input-container {
+            flex: 1;
+            position: relative;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            outline: none;
+            font-size: 16px;
+        }
+
+        .suggestions {
+            list-style: none;
+            background: rgba(0,0,0,0.7);
+            border-radius: 10px;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 150px;
+            overflow-y: auto;
+            z-index: 10;
+            color: white;
+            font-weight: bold;
+            display: none;
+        }
+
+        .suggestions li {
+            padding: 6px 4px;
+            cursor: pointer;
+        }
+
+        .suggestions li:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        .submit-btn {
+            background-color: #7c3aed;
+            color: white;
+            padding: 12px 20px;
+        }
+
+        .message {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .guess-item {
+            background-color: rgba(220,38,38,0.4);
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            font-size: 18px;
+            color: white;
+        }
+
+        .guess-item.correct {
+            background-color: rgba(22,163,74,0.5);
+        }
+
+        .hints-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 6px;
+            flex-wrap: wrap;
+        }
+
+        .hint-chip {
+            padding: 6px 12px;
+            border-radius: 12px;
+            color: white;
+            font-weight: bold;
+            text-transform: capitalize;
+            min-width: 80px;
+            text-align: center;
+            background-color: rgba(220,38,38,0.7);
+        }
+
+        .hint-chip.active {
+            background-color: rgba(22,163,74,0.7);
+        }
+
+        .game-info {
+            margin-top: 30px;
+            text-align: center;
+            opacity: 0.7;
+            font-size: 12px;
+        }
+
+        .reset-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-top: 10px;
+            display: inline-block;
+        }
+
+        .loading {
+            padding: 20px;
+            color: white;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Oedle</h1>
+        
+        <div class="mode-selector">
+            <button id="dailyBtn" class="daily-btn">Günlük Mod</button>
+            <button id="infiniteBtn" class="infinite-btn">Sınırsız Mod</button>
+        </div>
+        
+        <p class="description" id="gameDescription"></p>
+        
+        <form class="guess-form" id="guessForm">
+            <div class="input-container">
+                <input type="text" id="guessInput" placeholder="İsim gir (örn: Can)">
+                <ul class="suggestions" id="suggestions"></ul>
+            </div>
+            <button type="submit" class="submit-btn" id="submitBtn">Tahmin</button>
+        </form>
+        
+        <div class="message" id="message"></div>
+        
+        <div id="guessesContainer"></div>
+        
+        <div class="game-info" id="gameInfo"></div>
+        
+        <div style="text-align: center;">
+            <button class="reset-btn" id="resetBtn">Sıfırla</button>
+        </div>
+    </div>
+
+    <script>
+        // Friend data
+        const FRIENDS = [
+            {
+                id: 1,
+                name: "Ali",
+                hints: {
+                    feature: "full boxing",
+                    height: "çepeden uzun",
+                    lastYearClass: "A",
+                    emoji: "🥊",
+                },
+            },
+            {
+                id: 2,
+                name: "Çepe",
+                hints: {
+                    feature: "oçluk",
+                    height: "çepeyle aynı",
+                    lastYearClass: "A",
+                    emoji: "😈",
+                },
+            },
+            {
+                id: 3,
+                name: "Gökhan",
+                hints: {
+                    feature: "brawl stars",
+                    height: "çepeden uzun",
+                    lastYearClass: "B",
+                    emoji: "🎮",
+                },
+            },
+            {
+                id: 4,
+                name: "Eşme",
+                hints: {
+                    feature: "full boxing",
+                    height: "çepeden uzun",
+                    lastYearClass: "A",
+                    emoji: "🥊",
+                },
+            },
+            {
+                id: 5,
+                name: "Can gedik",
+                hints: {
+                    feature: "ingilizce dersi",
+                    height: "çepeden uzun",
+                    lastYearClass: "C",
+                    emoji: "",
+                },
+            },
+            {
+                id: 6,
+                name: "Mustafa Taş",
+                hints: {
+                    feature: "oe",
+                    height: "çepeden uzun",
+                    lastYearClass: "A",
+                    emoji: "",
+                },
+            },
+            {
+                id: 7,
+                name: "Berat Hocam",
+                hints: {
+                    feature: "Kel",
+                    height: "çepeden uzun",
+                    lastYearClass: "B",
+                    emoji: "",
+                },
+            },
+            {
+                id: 8,
+                name: "Sezar",
+                hints: {
+                    feature: "porno king",
+                    height: "çepeden uzun",
+                    lastYearClass: "A",
+                    emoji: "",
+                },
+            },
+            {
+                id: 9,
+                name: "Uğur eymen güven",
+                hints: {
+                    feature: "National swimmer",
+                    height: "çepeden uzun",
+                    lastYearClass: "B",
+                    emoji: "🏊",
+                },
+            },
+            {
+                id: 10,
+                name: "Demir kaan petek",
+                hints: {
+                    feature: "Some demür vibes",
+                    height: "çepeden kısa",
+                    lastYearClass: "A",
+                    emoji: "",
+                },
+            },
+            {
+                id: 11,
+                name: "Tuğra",
+                hints: {
+                    feature: "Lol",
+                    height: "çepeden uzun",
+                    lastYearClass: "A",
+                    emoji: "",
+                },
+            },
+            {
+                id: 12,
+                name: "ege portakaldalı",
+                hints: {
+                    feature: "business man",
+                    height: "çepeden kısa",
+                    lastYearClass: "A",
+                    emoji: "",
+                },
+            },
+            {
+                id: 13,
+                name: "yiğit emre coşkun",
+                hints: {
+                    feature: "ADANA ÜÇ(3)ÜNCÜLÜĞÜ",
+                    height: "çepeden uzun",
+                    lastYearClass: "Başka okul",
+                    emoji: "",
+                },
+            },
+            {
+                id: 14,
+                name: "Doruk Yağmurcu",
+                hints: {
+                    feature: "muay thai",
+                    height: "çepeden uzun",
+                    lastYearClass: "A",
+                    emoji: "",
+                },
+            },
+            {
+                id: 15,
+                name: "hasan mert",
+                hints: {
+                    feature: "full boxing",
+                    height: "çepeden uzun",
+                    lastYearClass: "B",
+                    emoji: "",
+                },
+            },
+            {
+                id: 16,
+                name: "Abdullah Selçuk",
+                hints: {
+                    feature: "oçcast",
+                    height: "çepeden uzun",
+                    lastYearClass: "A",
+                    emoji: "",
+                },
+            },
+            {
+                id: 17,
+                name: "apo",
+                hints: {
+                    feature: "sigmalabubuomnimankralvici",
+                    height: "çepeden uzun",
+                    lastYearClass: "Başka okul",
+                    emoji: "",
+                },
+            },
+            {
+                id: 18,
+                name: "dedemo",
+                hints: {
+                    feature: "amongus",
+                    height: "çepeden uzun",
+                    lastYearClass: "B",
+                    emoji: "",
+                },
+            },
+            {
+                id: 19,
+                name: "Soydan",
+                hints: {
+                    feature: "ders + taekwondo",
+                    height: "çepeden uzun",
+                    lastYearClass: "A",
+                    emoji: "",
+                },
+            },
+            {
+                id: 20,
+                name: "Fundo",
+                hints: {
+                    feature: "Lol",
+                    height: "çepeden uzun",
+                    lastYearClass: "Başka okul",
+                    emoji: "",
+                },
+            },
+        ];
+
+        // Game state
+        let gameState = {
+            mode: "daily",
+            target: null,
+            guesses: [],
+            won: false,
+            filteredSuggestions: []
+        };
+
+        // DOM elements
+        const dailyBtn = document.getElementById('dailyBtn');
+        const infiniteBtn = document.getElementById('infiniteBtn');
+        const gameDescription = document.getElementById('gameDescription');
+        const guessForm = document.getElementById('guessForm');
+        const guessInput = document.getElementById('guessInput');
+        const suggestions = document.getElementById('suggestions');
+        const submitBtn = document.getElementById('submitBtn');
+        const message = document.getElementById('message');
+        const guessesContainer = document.getElementById('guessesContainer');
+        const gameInfo = document.getElementById('gameInfo');
+        const resetBtn = document.getElementById('resetBtn');
+
+        // Initialize the game
+        function initGame() {
+            // Load game state from localStorage
+            loadGameState();
+            
+            // Set initial mode
+            setMode(gameState.mode);
+            
+            // Event listeners
+            dailyBtn.addEventListener('click', () => setMode('daily'));
+            infiniteBtn.addEventListener('click', () => setMode('infinite'));
+            guessForm.addEventListener('submit', handleSubmit);
+            guessInput.addEventListener('input', handleInput);
+            resetBtn.addEventListener('click', resetGame);
+            
+            // Render initial state
+            render();
+        }
+
+        // Generate a consistent index for daily mode
+        function seededIndexForDate(listLength) {
+            const d = new Date();
+            const seed = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+            let h = 0;
+            for (let i = 0; i < seed.length; i++) h = (h << 5) - h + seed.charCodeAt(i);
+            h = Math.abs(h);
+            return h % listLength;
+        }
+
+        // Set game mode
+        function setMode(mode) {
+            gameState.mode = mode;
+            gameState.won = false;
+            gameState.guesses = [];
+            message.textContent = '';
+            guessInput.value = '';
+            
+            // Update UI
+            dailyBtn.disabled = mode === 'daily';
+            infiniteBtn.disabled = mode === 'infinite';
+            infiniteBtn.classList.toggle('active', mode === 'infinite');
+            
+            // Set target friend
+            if (mode === 'daily') {
+                const idx = seededIndexForDate(FRIENDS.length);
+                gameState.target = FRIENDS[idx];
+                gameDescription.textContent = 'Günün arkadaşını tahmin et. Doğru özellikleri yeşil, yanlışları kırmızı olarak gör.';
+                gameInfo.textContent = 'Günlük oyun — her gün yeni hedef.';
+            } else {
+                gameState.target = FRIENDS[Math.floor(Math.random() * FRIENDS.length)];
+                gameDescription.textContent = 'Sınırsız modda istediğin kadar tahmin yapabilirsin.';
+                gameInfo.textContent = 'İstediğin kadar tahmin yapabilirsin.';
+            }
+            
+            // Save game state
+            saveGameState();
+            
+            // Render updates
+            render();
+        }
+
+        // Handle input changes
+        function handleInput() {
+            const val = guessInput.value.trim();
+            
+            if (!val) {
+                gameState.filteredSuggestions = [];
+                suggestions.style.display = 'none';
+                return;
+            }
+            
+            gameState.filteredSuggestions = FRIENDS.filter(f => 
+                f.name.toLowerCase().startsWith(val.toLowerCase())
+            ).map(f => f.name);
+            
+            renderSuggestions();
+        }
+
+        // Render suggestions dropdown
+        function renderSuggestions() {
+            suggestions.innerHTML = '';
+            
+            if (gameState.filteredSuggestions.length === 0) {
+                suggestions.style.display = 'none';
+                return;
+            }
+            
+            gameState.filteredSuggestions.forEach(suggestion => {
+                const li = document.createElement('li');
+                li.textContent = suggestion;
+                li.addEventListener('click', () => {
+                    guessInput.value = suggestion;
+                    gameState.filteredSuggestions = [];
+                    suggestions.style.display = 'none';
+                });
+                suggestions.appendChild(li);
+            });
+            
+            suggestions.style.display = 'block';
+        }
+
+        // Handle form submission
+        function handleSubmit(e) {
+            e.preventDefault();
+            
+            const guess = guessInput.value.trim();
+            if (!guess) return;
+            
+            const result = evaluateGuess(guess);
+            
+            if (!result.valid) {
+                message.textContent = 'İsmi yanlış yazdın.';
+                return;
+            }
+            
+            message.textContent = '';
+            gameState.guesses.push(result.feedback);
+            
+            if (result.feedback.correct) {
+                gameState.won = true;
+                message.textContent = `Tebrikler! Doğru kişi: ${result.feedback.name}`;
+            }
+            
+            guessInput.value = '';
+            gameState.filteredSuggestions = [];
+            suggestions.style.display = 'none';
+            
+            // Save game state
+            saveGameState();
+            
+            // Render updates
+            render();
+        }
+
+        // Evaluate a guess
+        function evaluateGuess(name) {
+            const normalized = name.trim().toLowerCase();
+            if (!gameState.target) return { valid: false };
+            
+            const correctName = gameState.target.name.toLowerCase();
+            const found = FRIENDS.find(f => f.name.toLowerCase() === normalized);
+            
+            if (!found) return { valid: false };
+            
+            const feedback = {
+                name: found.name,
+                correct: found.name.toLowerCase() === correctName,
+                hints: {
+                    feature: found.hints.feature === gameState.target.hints.feature,
+                    height: found.hints.height === gameState.target.hints.height,
+                    lastYearClass: found.hints.lastYearClass === gameState.target.hints.lastYearClass,
+                },
+            };
+            
+            return { valid: true, feedback };
+        }
+
+        // Reset the game
+        function resetGame() {
+            if (gameState.mode === 'daily') {
+                localStorage.removeItem(`oedle_daily_${new Date().toDateString()}`);
+                const idx = seededIndexForDate(FRIENDS.length);
+                gameState.target = FRIENDS[idx];
+            } else {
+                gameState.target = FRIENDS[Math.floor(Math.random() * FRIENDS.length)];
+            }
+            
+            gameState.guesses = [];
+            gameState.won = false;
+            message.textContent = '';
+            guessInput.value = '';
+            gameState.filteredSuggestions = [];
+            suggestions.style.display = 'none';
+            
+            saveGameState();
+            render();
+        }
+
+        // Render the game state
+        function render() {
+            submitBtn.disabled = gameState.won && gameState.mode === 'daily';
+            
+            // Render guesses
+            guessesContainer.innerHTML = '';
+            
+            if (gameState.guesses.length === 0) {
+                const emptyMsg = document.createElement('div');
+                emptyMsg.textContent = 'Henüz tahmin yok.';
+                emptyMsg.style.textAlign = 'center';
+                emptyMsg.style.opacity = '0.7';
+                guessesContainer.appendChild(emptyMsg);
+                return;
+            }
+            
+            gameState.guesses.forEach((guess, index) => {
+                const guessEl = document.createElement('div');
+                guessEl.className = `guess-item ${guess.correct ? 'correct' : ''}`;
+                
+                const guessText = document.createElement('div');
+                guessText.textContent = `#${index + 1} ${guess.name} ${guess.correct ? '✅' : ''}`;
+                guessEl.appendChild(guessText);
+                
+                const hintsContainer = document.createElement('div');
+                hintsContainer.className = 'hints-container';
+                
+                const featureChip = createHintChip('özellik', guess.hints.feature, 
+                    guess.hints.feature ? gameState.target.hints.feature : 
+                    FRIENDS.find(f => f.name === guess.name)?.hints.feature || '—');
+                
+                const heightChip = createHintChip('boy', guess.hints.height, 
+                    guess.hints.height ? gameState.target.hints.height : 
+                    FRIENDS.find(f => f.name === guess.name)?.hints.height || '—');
+                
+                const classChip = createHintChip('geçen sene sınıf', guess.hints.lastYearClass, 
+                    guess.hints.lastYearClass ? gameState.target.hints.lastYearClass : 
+                    FRIENDS.find(f => f.name === guess.name)?.hints.lastYearClass || '—');
+                
+                hintsContainer.appendChild(featureChip);
+                hintsContainer.appendChild(heightChip);
+                hintsContainer.appendChild(classChip);
+                
+                guessEl.appendChild(hintsContainer);
+                guessesContainer.appendChild(guessEl);
+            });
+        }
+
+        // Create a hint chip element
+        function createHintChip(label, active, value) {
+            const chip = document.createElement('div');
+            chip.className = `hint-chip ${active ? 'active' : ''}`;
+            chip.textContent = `${label}: ${value}`;
+            chip.title = active ? `${label} doğru` : `${label} yanlış`;
+            return chip;
+        }
+
+        // Load game state from localStorage
+        function loadGameState() {
+            if (gameState.mode === 'daily') {
+                const key = `oedle_daily_${new Date().toDateString()}`;
+                const saved = JSON.parse(localStorage.getItem(key));
+                
+                if (saved) {
+                    gameState.guesses = saved.guesses || [];
+                    gameState.won = saved.won || false;
+                }
+                
+                const idx = seededIndexForDate(FRIENDS.length);
+                gameState.target = FRIENDS[idx];
+            }
+        }
+
+        // Save game state to localStorage
+        function saveGameState() {
+            if (gameState.mode === 'daily') {
+                const key = `oedle_daily_${new Date().toDateString()}`;
+                localStorage.setItem(key, JSON.stringify({
+                    guesses: gameState.guesses,
+                    won: gameState.won
+                }));
+            }
+        }
+
+        // Initialize the game when the page loads
+        document.addEventListener('DOMContentLoaded', initGame);
+    </script>
+</body>
+</html>
