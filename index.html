@@ -40,6 +40,7 @@
             justify-content: center;
             gap: 10px;
             margin-bottom: 20px;
+            flex-wrap: wrap; /* Butonlar sığmazsa alt satıra geçsin */
         }
 
         button {
@@ -57,17 +58,24 @@
         }
 
         .daily-btn {
-            background-color: #22c55e;
+            background-color: #6b7280; /* Varsayılan gri */
             color: white;
         }
 
         .infinite-btn {
-            background-color: #6b7280;
+            background-color: #6b7280; /* Varsayılan gri */
             color: white;
         }
 
-        .infinite-btn.active {
-            background-color: #22c55e;
+        .image-btn { /* Yeni buton stili */
+            background-color: #6b7280; /* Varsayılan gri */
+            color: white;
+        }
+
+        .daily-btn.active,
+        .infinite-btn.active,
+        .image-btn.active { /* Aktif butonlar için ortak stil */
+            background-color: #22c55e; /* Yeşil */
         }
 
         .description {
@@ -176,6 +184,15 @@
             font-size: 12px;
         }
 
+        #imageHint {
+            transition: transform 1s ease;
+            object-fit: cover;
+            object-position: center;
+            transform-origin: center;
+            overflow: hidden;
+            transform: scale(4);
+        }
+
         .reset-btn {
             background: transparent;
             border: none;
@@ -200,9 +217,14 @@
         <div class="mode-selector">
             <button id="dailyBtn" class="daily-btn">Günlük Mod</button>
             <button id="infiniteBtn" class="infinite-btn">Sınırsız Mod</button>
+            <button id="imageModeBtn" class="image-btn">Görsel Mod</button> <!-- Yeni Buton -->
         </div>
         
         <p class="description" id="gameDescription"></p>
+
+        <div id="imageHintContainer" style="text-align: center; margin-bottom: 20px; border-radius: 10px; overflow: hidden; background: black;">
+            <img id="imageHint" src="" alt="Arkadaş İpucu" style="max-width: 100%; height: 300px; border-radius: 10px; display: none;" src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/81a5ac44-5079-4516-811d-a75cf3e2cce5.png">
+        </div>
         
         <form class="guess-form" id="guessForm">
             <div class="input-container">
@@ -236,6 +258,7 @@
                     birthYear: 2009,
                     emoji: "🥊",
                 },
+                image: "images/ali_kurtarici.jpg", // Örnek resim yolu
             },
             {
                 id: 2,
@@ -247,6 +270,7 @@
                     birthYear: 2008,
                     emoji: "😈",
                 },
+                image: "images/cepe.jpg", // Örnek resim yolu
             },
             {
                 id: 3,
@@ -258,6 +282,7 @@
                     birthYear: 2009,
                     emoji: "🎮",
                 },
+                image: "images/gokhan.jpg",
             },
             {
                 id: 4,
@@ -269,6 +294,7 @@
                     birthYear: 2009,
                     emoji: "🥊",
                 },
+                image: "images/esme.jpg",
             },
             {
                 id: 5,
@@ -280,6 +306,7 @@
                     birthYear: 2009,
                     emoji: "",
                 },
+                image: "images/can_gedik.jpg",
             },
             {
                 id: 6,
@@ -291,6 +318,7 @@
                     birthYear: 2008,
                     emoji: "",
                 },
+                image: "images/mustafa_tas.jpg",
             },
             {
                 id: 7,
@@ -302,6 +330,7 @@
                     birthYear: 2009,
                     emoji: "",
                 },
+                image: "images/berat_hocam.jpg",
             },
             {
                 id: 8,
@@ -313,6 +342,7 @@
                    birthYear: 2009,
                     emoji: "",
                 },
+                image: "images/sezar.jpg",
             },
             {
                 id: 9,
@@ -324,6 +354,7 @@
                   birthYear: 2008,
                     emoji: "🏊",
                 },
+                image: "images/ugur_eymen_guven.jpg",
             },
             {
                 id: 10,
@@ -335,6 +366,7 @@
                    birthYear: 2009,
                     emoji: "",
                 },
+                image: "images/demir_kaan_petek.jpg",
             },
             {
                 id: 11,
@@ -346,6 +378,7 @@
                     birthYear: 2009,
                     emoji: "",
                 },
+                image: "images/tugra.jpg",
             },
             {
                 id: 12,
@@ -357,6 +390,7 @@
                     birthYear: 2009,
                     emoji: "",
                 },
+                image: "images/ege_portakaldali.jpg",
             },
             {
                 id: 13,
@@ -368,6 +402,7 @@
                     birthYear: 2009,
                     emoji: "",
                 },
+                image: "images/yigit_emre_coskun.jpg",
             },
             {
                 id: 14,
@@ -379,6 +414,7 @@
                    birthYear: 2009,
                     emoji: "",
                 },
+                image: "images/doruk_yagmurcu.jpg",
             },
             {
                 id: 15,
@@ -390,6 +426,7 @@
                     birthYear: 2009,
                     emoji: "",
                 },
+                image: "images/hasan_mert.jpg",
             },
             {
                 id: 16,
@@ -401,6 +438,7 @@
                     birthYear: 2009,
                      emoji: "",
                 },
+                image: "images/abdullah_selcuk.jpg",
             },
             {
                 id: 17,
@@ -412,6 +450,7 @@
                      birthYear: 2009,
                     emoji: "",
                 },
+                image: "images/apo.jpg",
             },
             {
                 id: 18,
@@ -423,6 +462,7 @@
                     birthYear: 2009,
                     emoji: "",
                 },
+                image: "images/dedemo.jpg",
             },
             {
                 id: 19,
@@ -434,6 +474,7 @@
                     birthYear: 2009,
                     emoji: "",
                 },
+                image: "images/soydan.jpg",
             },
             {
                 id: 20,
@@ -445,6 +486,7 @@
                     birthYear: 2009,
                     emoji: "",
                 },
+                image: "images/fundo.jpg",
             },
             {
                 id: 21,
@@ -456,6 +498,7 @@
                     birthYear: 2009,
                     emoji: "",
                 },
+                image: "images/bombe_yilmaz.jpg",
             },
             {
                 id: 22,
@@ -467,6 +510,7 @@
                     birthYear: 2009,
                     emoji: "",
                 },
+                image: "images/mami.jpg",
             },
             {
                 id: 23,
@@ -478,6 +522,7 @@
                     birthYear: 20089,
                     emoji: "",
                 },
+                image: "images/memocan.jpg",
             },
             {
                 id: 24,
@@ -489,6 +534,7 @@
                     birthYear: 2008,
                     emoji: "",
                 },
+                image: "images/koksal_topal.jpg",
             },
             {
                 id: 25,
@@ -500,6 +546,7 @@
                     birthYear: 2008,
                     emoji: "",
                 },
+                image: "images/prime_utku.jpg",
             },
             {
                 id: 26,
@@ -511,6 +558,7 @@
                     birthYear: 20089,
                     emoji: "",
                 },
+                image: "images/ayakkabisiz_gitar_calan_kivircik_adam.jpg",
             },
             {
                 id: 27,
@@ -522,6 +570,7 @@
                     birthYear: 2009,
                     emoji: "",
                 },
+                image: "images/eray.jpg",
             },
             {
                 id: 28,
@@ -533,6 +582,7 @@
                     birthYear: 2009,
                     emoji: "",
                 },
+                image: "images/doruk_koc.jpg",
             },
             {
                 id: 29,
@@ -544,6 +594,7 @@
                     birthYear: 20089,
                     emoji: "",
                 },
+                image: "images/alp_aydiz.jpg",
             },
             {
                 id: 30,
@@ -555,8 +606,9 @@
                     birthYear: 2010,
                     emoji: "",
                 },
+                image: "images/bereli_oglan.jpg",
             },
-       {
+            {
                 id: 31,
                 name: "ozan şenkaya",
                 hints: {
@@ -566,8 +618,9 @@
                     birthYear: 2009,
                     emoji: "",
                 },
+                image: "images/ozan_senkaya.jpg",
             },
-       {
+            {
                 id: 32,
                 name: "efe altıkulaç",
                 hints: {
@@ -577,8 +630,9 @@
                     birthYear: 2009,
                     emoji: "",
                 },
+                image: "images/efe_altikulac.jpg",
             },
-      {
+            {
                 id: 33,
                 name: "Can Özsürekçigil",
                 hints: {
@@ -588,8 +642,9 @@
                     birthYear: 2009,
                     emoji: "",
                 },
+                image: "images/can_ozsurekcigil.jpg",
             },
-         {
+            {
                 id: 34,
                 name: "yiğit aysu",
                 hints: {
@@ -599,8 +654,9 @@
                     birthYear: 20089,
                     emoji: "",
                 },
+                image: "images/yigit_aysu.jpg",
             },
-       {
+            {
                 id: 35,
                 name: "Uzun Oğlan",
                 hints: {
@@ -610,8 +666,9 @@
                     birthYear: 2010,
                     emoji: "",
                 },
+                image: "images/uzun_oglan.jpg",
             },
-         {
+            {
                 id: 36,
                 name: "Yusuf halaçeli",
                 hints: {
@@ -621,12 +678,16 @@
                     birthYear: 2011,
                     emoji: "",
                 },
+                image: "images/yusuf_halaceli.jpg",
             },
         ];
 
+        // Belirtilen arkadaşlar için ID'ler
+        const IMAGE_MODE_FRIENDS_IDS = [7, 11, 6, 8, 2, 1, 16]; // Berat Hocam, Tuğra, Mustafa Taş, Sezar, Çepe, Ali Kurtarıcı, Abdullah Selçuk
+
         // Game state
         let gameState = {
-            mode: "daily",
+            mode: "daily", // Varsayılan mod günlük
             target: null,
             guesses: [],
             won: false,
@@ -636,6 +697,7 @@
         // DOM elements
         const dailyBtn = document.getElementById('dailyBtn');
         const infiniteBtn = document.getElementById('infiniteBtn');
+        const imageModeBtn = document.getElementById('imageModeBtn');
         const gameDescription = document.getElementById('gameDescription');
         const guessForm = document.getElementById('guessForm');
         const guessInput = document.getElementById('guessInput');
@@ -645,18 +707,21 @@
         const guessesContainer = document.getElementById('guessesContainer');
         const gameInfo = document.getElementById('gameInfo');
         const resetBtn = document.getElementById('resetBtn');
+        const imageHint = document.getElementById('imageHint');
+        const imageHintContainer = document.getElementById('imageHintContainer');
 
         // Initialize the game
         function initGame() {
             // Load game state from localStorage
             loadGameState();
             
-            // Set initial mode
+            // Set initial mode based on loaded state or default
             setMode(gameState.mode);
             
             // Event listeners
             dailyBtn.addEventListener('click', () => setMode('daily'));
             infiniteBtn.addEventListener('click', () => setMode('infinite'));
+            imageModeBtn.addEventListener('click', () => setMode('image'));
             guessForm.addEventListener('submit', handleSubmit);
             guessInput.addEventListener('input', handleInput);
             resetBtn.addEventListener('click', resetGame);
@@ -665,7 +730,7 @@
             render();
         }
 
-        // Generate a consistent index for daily mode
+        // Generate a consistent index for daily and image modes based on date
         function seededIndexForDate(listLength) {
             const d = new Date();
             const seed = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
@@ -683,21 +748,48 @@
             message.textContent = '';
             guessInput.value = '';
             
-            // Update UI
-            dailyBtn.disabled = mode === 'daily';
-            infiniteBtn.disabled = mode === 'infinite';
-            infiniteBtn.classList.toggle('active', mode === 'infinite');
+            // Update UI (button active states)
+            dailyBtn.classList.remove('active');
+            infiniteBtn.classList.remove('active');
+            imageModeBtn.classList.remove('active');
+
+            dailyBtn.disabled = false;
+            infiniteBtn.disabled = false;
+            imageModeBtn.disabled = false;
+
+            if (mode === 'daily') {
+                dailyBtn.classList.add('active');
+                dailyBtn.disabled = true;
+            } else if (mode === 'infinite') {
+                infiniteBtn.classList.add('active');
+                infiniteBtn.disabled = true;
+            } else if (mode === 'image') {
+                imageModeBtn.classList.add('active');
+                imageModeBtn.disabled = true;
+            }
             
-            // Set target friend
+            // Set target friend based on mode
             if (mode === 'daily') {
                 const idx = seededIndexForDate(FRIENDS.length);
                 gameState.target = FRIENDS[idx];
                 gameDescription.textContent = 'Günün arkadaşını tahmin et. Doğru özellikleri yeşil, yanlışları kırmızı olarak gör.';
                 gameInfo.textContent = 'Günlük oyun — her gün yeni hedef.';
-            } else {
+                imageHint.style.display = 'none'; // Hide image for daily mode
+            } else if (mode === 'image') {
+                // Filter FRIENDS to only include those in IMAGE_MODE_FRIENDS_IDS
+                const imageModeFriends = FRIENDS.filter(friend => IMAGE_MODE_FRIENDS_IDS.includes(friend.id));
+                const idx = seededIndexForDate(imageModeFriends.length);
+                gameState.target = imageModeFriends[idx];
+                gameDescription.textContent = 'Görseldeki arkadaşı tahmin et!';
+                gameInfo.textContent = 'Görsel oyun — her gün yeni hedef.';
+                imageHint.src = gameState.target.image; // Set image source
+                imageHint.style.display = 'block'; // Show image for image mode
+                imageHint.style.transform = 'scale(4)'; // Start zoomed in
+            } else if (mode === 'infinite') { // Infinite mode uses random target from all friends
                 gameState.target = FRIENDS[Math.floor(Math.random() * FRIENDS.length)];
                 gameDescription.textContent = 'Sınırsız modda istediğin kadar tahmin yapabilirsin.';
                 gameInfo.textContent = 'İstediğin kadar tahmin yapabilirsin.';
+                imageHint.style.display = 'none'; // Hide image for infinite mode
             }
             
             // Save game state
@@ -707,7 +799,7 @@
             render();
         }
 
-        // Handle input changes
+        // Handle input changes for suggestions
         function handleInput() {
             const val = guessInput.value.trim();
             
@@ -717,6 +809,7 @@
                 return;
             }
             
+            // Suggestions should always be from the full FRIENDS list
             gameState.filteredSuggestions = FRIENDS.filter(f => 
                 f.name.toLowerCase().startsWith(val.toLowerCase())
             ).map(f => f.name);
@@ -780,7 +873,7 @@
             render();
         }
 
-        // Evaluate a guess
+        // Evaluate a guess against the target friend
         function evaluateGuess(name) {
             const normalized = name.trim().toLowerCase();
             if (!gameState.target) return { valid: false };
@@ -794,6 +887,7 @@
                 name: found.name,
                 correct: found.name.toLowerCase() === correctName,
                 hints: {
+                    // Compare hints only if not in image mode, or if you want to show them in image mode too
                     feature: found.hints.feature === gameState.target.hints.feature,
                     height: found.hints.height === gameState.target.hints.height, 
                     lastYearClass: found.hints.lastYearClass === gameState.target.hints.lastYearClass,
@@ -804,13 +898,18 @@
             return { valid: true, feedback };
         }
 
-        // Reset the game
+        // Reset the game state
         function resetGame() {
             if (gameState.mode === 'daily') {
                 localStorage.removeItem(`oedle_daily_${new Date().toDateString()}`);
                 const idx = seededIndexForDate(FRIENDS.length);
                 gameState.target = FRIENDS[idx];
-            } else {
+            } else if (gameState.mode === 'image') {
+                localStorage.removeItem(`oedle_image_${new Date().toDateString()}`);
+                const imageModeFriends = FRIENDS.filter(friend => IMAGE_MODE_FRIENDS_IDS.includes(friend.id));
+                const idx = seededIndexForDate(imageModeFriends.length);
+                gameState.target = imageModeFriends[idx];
+            } else { // Infinite mode resets with a new random target from all friends
                 gameState.target = FRIENDS[Math.floor(Math.random() * FRIENDS.length)];
             }
             
@@ -821,15 +920,24 @@
             gameState.filteredSuggestions = [];
             suggestions.style.display = 'none';
             
+            // Update image display based on current mode
+            if (gameState.mode === 'image') {
+                imageHint.src = gameState.target.image;
+                imageHint.style.display = 'block';
+            } else {
+                imageHint.style.display = 'none';
+            }
+
             saveGameState();
             render();
         }
 
-        // Render the game state
+        // Render the current game state to the UI
         function render() {
-            submitBtn.disabled = gameState.won && gameState.mode === 'daily';
+            // Disable submit button if won in daily or image mode
+            submitBtn.disabled = gameState.won && (gameState.mode === 'daily' || gameState.mode === 'image');
             
-            // Render guesses
+            // Clear previous guesses
             guessesContainer.innerHTML = '';
             
             if (gameState.guesses.length === 0) {
@@ -841,6 +949,16 @@
                 return;
             }
             
+            // Calculate and apply zoom level based on number of guesses
+            if (gameState.mode === 'image') {
+                const maxZoom = 4;
+                const minZoom = 1;
+                const zoomSteps = 5; // Total guesses needed to fully unzoom
+                const currentZoom = Math.max(minZoom, maxZoom - (gameState.guesses.length * (maxZoom - minZoom) / zoomSteps));
+                imageHint.style.transform = `scale(${currentZoom})`;
+            }
+
+            // Render each guess
             gameState.guesses.forEach((guess, index) => {
                 const guessEl = document.createElement('div');
                 guessEl.className = `guess-item ${guess.correct ? 'correct' : ''}`;
@@ -849,36 +967,36 @@
                 guessText.textContent = `#${index + 1} ${guess.name} ${guess.correct ? '✅' : ''}`;
                 guessEl.appendChild(guessText);
                 
-                const hintsContainer = document.createElement('div');
-                hintsContainer.className = 'hints-container';
-                
-                const featureChip = createHintChip('özellik', guess.hints.feature, 
-                    guess.hints.feature ? gameState.target.hints.feature : 
-                    FRIENDS.find(f => f.name === guess.name)?.hints.feature || '—');
-                
-                const heightChip = createHintChip('boy', guess.hints.height, 
-                    guess.hints.height ? gameState.target.hints.height : 
-                    FRIENDS.find(f => f.name === guess.name)?.hints.height || '—');
-                
-                const classChip = createHintChip('geçen sene sınıf', guess.hints.lastYearClass, 
-                    guess.hints.lastYearClass ? gameState.target.hints.lastYearClass : 
-                    FRIENDS.find(f => f.name === guess.name)?.hints.lastYearClass || '—');
+                // Only show hints if not in image mode
+                if (gameState.mode !== 'image') {
+                    const hintsContainer = document.createElement('div');
+                    hintsContainer.className = 'hints-container';
+                    
+                    // Create hint chips for each property
+                    const featureChip = createHintChip('özellik', guess.hints.feature, 
+                        FRIENDS.find(f => f.name === guess.name)?.hints.feature || '—');
+                    
+                    const heightChip = createHintChip('boy', guess.hints.height, 
+                        FRIENDS.find(f => f.name === guess.name)?.hints.height || '—');
+                    
+                    const classChip = createHintChip('geçen sene sınıf', guess.hints.lastYearClass, 
+                        FRIENDS.find(f => f.name === guess.name)?.hints.lastYearClass || '—');
 
-                const birthYearChip = createHintChip('doğum yılı', guess.hints.birthYear,
-                    guess.hints.birthYear ? gameState.target.hints.birthYear :
-                    FRIENDS.find(f => f.name === guess.name)?.hints.birthYear || '—');
-                
-                hintsContainer.appendChild(featureChip);
-                hintsContainer.appendChild(heightChip);
-                hintsContainer.appendChild(classChip);
-                hintsContainer.appendChild(birthYearChip);
-                
-                guessEl.appendChild(hintsContainer);
+                    const birthYearChip = createHintChip('doğum yılı', guess.hints.birthYear,
+                        FRIENDS.find(f => f.name === guess.name)?.hints.birthYear || '—');
+                    
+                    hintsContainer.appendChild(featureChip);
+                    hintsContainer.appendChild(heightChip);
+                    hintsContainer.appendChild(classChip);
+                    hintsContainer.appendChild(birthYearChip);
+                    
+                    guessEl.appendChild(hintsContainer);
+                }
                 guessesContainer.appendChild(guessEl);
             });
         }
 
-        // Create a hint chip element
+        // Helper function to create a hint chip element
         function createHintChip(label, active, value) {
             const chip = document.createElement('div');
             chip.className = `hint-chip ${active ? 'active' : ''}`;
@@ -889,29 +1007,59 @@
 
         // Load game state from localStorage
         function loadGameState() {
+            const today = new Date().toDateString();
+            const dailyKey = `oedle_daily_${today}`;
+            const imageKey = `oedle_image_${today}`;
+
+            const savedDaily = JSON.parse(localStorage.getItem(dailyKey));
+            const savedImage = JSON.parse(localStorage.getItem(imageKey));
+
+            // Prioritize loading daily mode if available
+            if (savedDaily) {
+                gameState.guesses = savedDaily.guesses || [];
+                gameState.won = savedDaily.won || false;
+                gameState.mode = 'daily';
+            } else if (savedImage) { // Otherwise, check for image mode
+                gameState.guesses = savedImage.guesses || [];
+                gameState.won = savedImage.won || false;
+                gameState.mode = 'image';
+            } else {
+                // Default to daily mode if no saved state for today
+                gameState.mode = 'daily';
+            }
+            
+            // Set target based on the determined mode
             if (gameState.mode === 'daily') {
-                const key = `oedle_daily_${new Date().toDateString()}`;
-                const saved = JSON.parse(localStorage.getItem(key));
-                
-                if (saved) {
-                    gameState.guesses = saved.guesses || [];
-                    gameState.won = saved.won || false;
-                }
-                
                 const idx = seededIndexForDate(FRIENDS.length);
                 gameState.target = FRIENDS[idx];
+            } else if (gameState.mode === 'image') {
+                const imageModeFriends = FRIENDS.filter(friend => IMAGE_MODE_FRIENDS_IDS.includes(friend.id));
+                const idx = seededIndexForDate(imageModeFriends.length);
+                gameState.target = imageModeFriends[idx];
+            } else {
+                // For infinite mode, target is set when setMode is called
+                // This is just a fallback, setMode will properly initialize it
+                gameState.target = FRIENDS[Math.floor(Math.random() * FRIENDS.length)];
             }
         }
 
         // Save game state to localStorage
         function saveGameState() {
+            const today = new Date().toDateString();
             if (gameState.mode === 'daily') {
-                const key = `oedle_daily_${new Date().toDateString()}`;
+                const key = `oedle_daily_${today}`;
+                localStorage.setItem(key, JSON.stringify({
+                    guesses: gameState.guesses,
+                    won: gameState.won
+                }));
+            } else if (gameState.mode === 'image') {
+                const key = `oedle_image_${today}`;
                 localStorage.setItem(key, JSON.stringify({
                     guesses: gameState.guesses,
                     won: gameState.won
                 }));
             }
+            // Infinite mode state is not persisted across sessions by default in this setup
         }
 
         // Initialize the game when the page loads
