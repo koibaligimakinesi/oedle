@@ -690,7 +690,7 @@
         ];
 
         // Belirtilen arkadaşlar için ID'ler
-        const IMAGE_MODE_FRIENDS_IDS = [7, 11, 6, 8, 2, 1, 16, 13]; // Berat Hocam, Tuğra, Mustafa Taş, Sezar, Çepe, Ali Kurtarıcı, Abdullah Selçuk, yiğit emre coşkun
+        const IMAGE_MODE_FRIENDS_IDS = [7, 11, 6, 8, 2, 1, 16, 13, 12, 10, 15, 20, 21, 29, 18]; // Berat Hocam, Tuğra, Mustafa Taş, Sezar, Çepe, Ali Kurtarıcı, Abdullah Selçuk, yiğit emre coşkun, ege portakaldalı, demir kaan petek, hasan mert, fundo, Bombe yılmaz, alp aydız, dedemo
 
         // Game state
         let gameState = {
@@ -882,6 +882,11 @@
             if (result.feedback.correct) {
                 gameState.won = true;
                 message.textContent = `Tebrikler! Doğru kişi: ${result.feedback.name}`;
+                
+                // Auto-reset in infinite modes
+                if (gameState.mode === 'infinite' || gameState.mode === 'imageInfinite') {
+                    setTimeout(resetGame, 1000);
+                }
             }
             
             guessInput.value = '';
@@ -931,7 +936,7 @@
                 const imageModeFriends = FRIENDS.filter(friend => IMAGE_MODE_FRIENDS_IDS.includes(friend.id));
                 const idx = seededIndexForDate(imageModeFriends.length);
                 gameState.target = imageModeFriends[idx];
-            } else if (mode === 'imageInfinite') {
+            } else if (gameState.mode === 'imageInfinite') {
                 const imageModeFriends = FRIENDS.filter(friend => IMAGE_MODE_FRIENDS_IDS.includes(friend.id));
                 gameState.target = imageModeFriends[Math.floor(Math.random() * imageModeFriends.length)];
             } else { // Infinite mode resets with a new random target from all friends
@@ -977,11 +982,15 @@
             
             // Calculate and apply zoom level based on number of guesses
             if (gameState.mode === 'image' || gameState.mode === 'imageInfinite') {
-                const maxZoom = 4;
-                const minZoom = 1;
-                const zoomSteps = 5; // Total guesses needed to fully unzoom
-                const currentZoom = Math.max(minZoom, maxZoom - (gameState.guesses.length * (maxZoom - minZoom) / zoomSteps));
-                imageHint.style.transform = `scale(${currentZoom})`;
+                if (gameState.won) {
+                    imageHint.style.transform = 'scale(1)'; // Remove zoom when correct
+                } else {
+                    const maxZoom = 4;
+                    const minZoom = 1;
+                    const zoomSteps = 5; // Total guesses needed to fully unzoom
+                    const currentZoom = Math.max(minZoom, maxZoom - (gameState.guesses.length * (maxZoom - minZoom) / zoomSteps));
+                    imageHint.style.transform = `scale(${currentZoom})`;
+                }
             }
 
             // Render each guess
