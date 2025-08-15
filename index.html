@@ -72,9 +72,15 @@
             color: white;
         }
 
+        .image-infinite-btn {
+            background-color: #6b7280; /* Varsayılan gri */
+            color: white;
+        }
+
         .daily-btn.active,
         .infinite-btn.active,
-        .image-btn.active { /* Aktif butonlar için ortak stil */
+        .image-btn.active,
+        .image-infinite-btn.active { /* Aktif butonlar için ortak stil */
             background-color: #22c55e; /* Yeşil */
         }
 
@@ -217,7 +223,8 @@
         <div class="mode-selector">
             <button id="dailyBtn" class="daily-btn">Günlük Mod</button>
             <button id="infiniteBtn" class="infinite-btn">Sınırsız Mod</button>
-            <button id="imageModeBtn" class="image-btn">Görsel Mod</button> <!-- Yeni Buton -->
+            <button id="imageModeBtn" class="image-btn">Görsel Mod</button>
+            <button id="imageInfiniteBtn" class="image-infinite-btn">Görsel Sınırsız</button>
         </div>
         
         <p class="description" id="gameDescription"></p>
@@ -683,7 +690,7 @@
         ];
 
         // Belirtilen arkadaşlar için ID'ler
-        const IMAGE_MODE_FRIENDS_IDS = [7, 11, 6, 8, 2, 1, 16, 13,12]; 
+        const IMAGE_MODE_FRIENDS_IDS = [7, 11, 6, 8, 2, 1, 16, 13]; // Berat Hocam, Tuğra, Mustafa Taş, Sezar, Çepe, Ali Kurtarıcı, Abdullah Selçuk, yiğit emre coşkun
 
         // Game state
         let gameState = {
@@ -698,6 +705,7 @@
         const dailyBtn = document.getElementById('dailyBtn');
         const infiniteBtn = document.getElementById('infiniteBtn');
         const imageModeBtn = document.getElementById('imageModeBtn');
+        const imageInfiniteBtn = document.getElementById('imageInfiniteBtn');
         const gameDescription = document.getElementById('gameDescription');
         const guessForm = document.getElementById('guessForm');
         const guessInput = document.getElementById('guessInput');
@@ -722,6 +730,7 @@
             dailyBtn.addEventListener('click', () => setMode('daily'));
             infiniteBtn.addEventListener('click', () => setMode('infinite'));
             imageModeBtn.addEventListener('click', () => setMode('image'));
+            imageInfiniteBtn.addEventListener('click', () => setMode('imageInfinite'));
             guessForm.addEventListener('submit', handleSubmit);
             guessInput.addEventListener('input', handleInput);
             resetBtn.addEventListener('click', resetGame);
@@ -752,10 +761,12 @@
             dailyBtn.classList.remove('active');
             infiniteBtn.classList.remove('active');
             imageModeBtn.classList.remove('active');
+            imageInfiniteBtn.classList.remove('active');
 
             dailyBtn.disabled = false;
             infiniteBtn.disabled = false;
             imageModeBtn.disabled = false;
+            imageInfiniteBtn.disabled = false;
 
             if (mode === 'daily') {
                 dailyBtn.classList.add('active');
@@ -766,6 +777,9 @@
             } else if (mode === 'image') {
                 imageModeBtn.classList.add('active');
                 imageModeBtn.disabled = true;
+            } else if (mode === 'imageInfinite') {
+                imageInfiniteBtn.classList.add('active');
+                imageInfiniteBtn.disabled = true;
             }
             
             // Set target friend based on mode
@@ -790,6 +804,14 @@
                 gameDescription.textContent = 'Sınırsız modda istediğin kadar tahmin yapabilirsin.';
                 gameInfo.textContent = 'İstediğin kadar tahmin yapabilirsin.';
                 imageHint.style.display = 'none'; // Hide image for infinite mode
+            } else if (mode === 'imageInfinite') { // Image infinite mode
+                const imageModeFriends = FRIENDS.filter(friend => IMAGE_MODE_FRIENDS_IDS.includes(friend.id));
+                gameState.target = imageModeFriends[Math.floor(Math.random() * imageModeFriends.length)];
+                gameDescription.textContent = 'Görsel sınırsız modda istediğin kadar tahmin yapabilirsin!';
+                gameInfo.textContent = 'Görsel sınırsız oyun — istediğin kadar yeni hedef.';
+                imageHint.src = gameState.target.image;
+                imageHint.style.display = 'block';
+                imageHint.style.transform = 'scale(4)'; // Start zoomed in
             }
             
             // Save game state
@@ -909,6 +931,9 @@
                 const imageModeFriends = FRIENDS.filter(friend => IMAGE_MODE_FRIENDS_IDS.includes(friend.id));
                 const idx = seededIndexForDate(imageModeFriends.length);
                 gameState.target = imageModeFriends[idx];
+            } else if (mode === 'imageInfinite') {
+                const imageModeFriends = FRIENDS.filter(friend => IMAGE_MODE_FRIENDS_IDS.includes(friend.id));
+                gameState.target = imageModeFriends[Math.floor(Math.random() * imageModeFriends.length)];
             } else { // Infinite mode resets with a new random target from all friends
                 gameState.target = FRIENDS[Math.floor(Math.random() * FRIENDS.length)];
             }
@@ -921,9 +946,10 @@
             suggestions.style.display = 'none';
             
             // Update image display based on current mode
-            if (gameState.mode === 'image') {
+            if (gameState.mode === 'image' || gameState.mode === 'imageInfinite') {
                 imageHint.src = gameState.target.image;
                 imageHint.style.display = 'block';
+                imageHint.style.transform = 'scale(4)'; // Reset zoom
             } else {
                 imageHint.style.display = 'none';
             }
@@ -950,7 +976,7 @@
             }
             
             // Calculate and apply zoom level based on number of guesses
-            if (gameState.mode === 'image') {
+            if (gameState.mode === 'image' || gameState.mode === 'imageInfinite') {
                 const maxZoom = 4;
                 const minZoom = 1;
                 const zoomSteps = 5; // Total guesses needed to fully unzoom
@@ -967,8 +993,8 @@
                 guessText.textContent = `#${index + 1} ${guess.name} ${guess.correct ? '✅' : ''}`;
                 guessEl.appendChild(guessText);
                 
-                // Only show hints if not in image mode
-                if (gameState.mode !== 'image') {
+                // Only show hints if not in image modes
+                if (gameState.mode !== 'image' && gameState.mode !== 'imageInfinite') {
                     const hintsContainer = document.createElement('div');
                     hintsContainer.className = 'hints-container';
                     
